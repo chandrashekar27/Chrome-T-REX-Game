@@ -2,7 +2,7 @@
 main .py script to run to play the game
 consists of the main game loop
 """
-
+import os
 # import other scripts
 from allobj import *
 # basic settings
@@ -17,7 +17,11 @@ pygame.mixer.init()
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
 screen.fill(WHITE)
 clock = pygame.time.Clock()
-
+# set caption
+pygame.display.set_caption('T-REX Run')
+# set icon for game
+game_icon = pygame.image.load('game_icon.ico')
+pygame.display.set_icon(game_icon)
 
 # make a group that has all sprites
 all_sprites = pygame.sprite.Group()
