@@ -12,46 +12,47 @@ FPS = 60
 
 
 # set up the pygame window
-pygame.init()
-pygame.mixer.init()
-screen = pygame.display.set_mode([WIDTH, HEIGHT])
+pg.init()
+pg.mixer.init()
+screen = pg.display.set_mode([WIDTH, HEIGHT])
 screen.fill(WHITE)
-clock = pygame.time.Clock()
+clock = pg.time.Clock()
 # set caption
-pygame.display.set_caption('T-REX Run')
+pg.display.set_caption('T-REX Run')
 # set icon for game
-game_icon = pygame.image.load('game_icon.ico')
-pygame.display.set_icon(game_icon)
+game_icon = pg.image.load('game_icon.ico')
+pg.display.set_icon(game_icon)
 
 # make a group that has all sprites
-all_sprites = pygame.sprite.Group()
+all_sprites = pg.sprite.Group()
+# other groups for other objets
+all_birds = pg.sprite.Group()
 # the platform sprite
 main_platform = Platform(WIDTH / 2, HEIGHT - 17)
 all_sprites.add(main_platform)
 # player sprite
 the_player = Player()
-#print(the_player.rect.bottom)
 all_sprites.add(the_player)
 # start the main game loop
 running = True
 alive = False
-platform_img = pygame.image.load(path.join(img_dir, "platform.png")).convert()
+platform_img = pg.image.load(path.join(img_dir, "platform.png")).convert()
 platform_img.set_colorkey(PLATFORM_BLUE)
 # display start screen stuff
 screen.blit(platform_img, (0, HEIGHT - 20))
 all_sprites.draw(screen)
 # flip the dislay
-pygame.display.flip()
+pg.display.flip()
 while running:
 
     # check for inputs
-    for event in pygame.event.get():
+    for event in pg.event.get():
         # check for closing window
-        if event.type == pygame.QUIT:
+        if event.type == pg.QUIT:
             running = False
         # check if player starts game
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE or event.key == pygame.K_UP:
+        elif event.type == pg.KEYDOWN:
+            if event.key == pg.K_SPACE or event.key == pg.K_UP:
                 alive = True
     if alive:
         # white screen to draw on next frame
@@ -64,14 +65,15 @@ while running:
         screen.blit(platform_img, (rel_x - 1189, HEIGHT - 20))
         #  Update
         all_sprites.update()
+        all_birds.update()
         #  Draw / render
         all_sprites.draw(screen)
         # flip the dislay
-        pygame.display.flip()
+        pg.display.flip()
     #  keep loop running at the right speed
     clock.tick(FPS)
-    # print(str(clock.get_fps()))
-    print(pygame.sprite.collide_rect_ratio(1)(main_platform, the_player))
+    print(str(clock.get_fps()))
+    # print(pg.sprite.collide_rect_ratio(1)(main_platform, the_player))
 # quit pygame
-pygame.quit()
+pg.quit()
 quit()
