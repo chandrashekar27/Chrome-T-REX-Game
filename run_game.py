@@ -27,6 +27,7 @@ pg.display.set_icon(game_icon)
 all_sprites = pg.sprite.Group()
 # other groups for other objets
 all_birds = pg.sprite.Group()
+all_plants = pg.sprite.Group()
 # the platform sprite
 main_platform = Platform(WIDTH / 2, HEIGHT - 17)
 all_sprites.add(main_platform)
@@ -65,7 +66,6 @@ while running:
         screen.blit(platform_img, (rel_x - 1189, HEIGHT - 20))
         #  Update
         all_sprites.update()
-        all_birds.update()
         #  Draw / render
         all_sprites.draw(screen)
         # flip the dislay

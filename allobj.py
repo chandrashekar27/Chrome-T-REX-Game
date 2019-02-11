@@ -121,12 +121,13 @@ class Player(pg.sprite.Sprite):
 class Plant(pg.sprite.Sprite):
     '''
     creates a plant sprite
-    takes 1 argument
+    takes 2 arguments
     an integer from 1-6
     for random generation of plants
+    and x coordinate to spawn
     '''
 
-    def __init__(self, num):
+    def __init__(self, num, x):
         pg.sprite.Sprite.__init__(self)
         # load the images of all plants
         self.image1 = pg.image.load(path.join(img_dir, 'small_plant_1.png')).convert()
@@ -135,6 +136,37 @@ class Plant(pg.sprite.Sprite):
         self.image4 = pg.image.load(path.join(img_dir, 'big_plant_1.png')).convert()
         self.image5 = pg.image.load(path.join(img_dir, 'big_plant_2.png')).convert()
         self.image6 = pg.image.load(path.join(img_dir, 'big_plant_3.png')).convert()
+        # decide which plant to display
+        if num == 1:
+            self.image = self.image1
+        elif num == 2:
+            self.image = self.image2
+        elif num == 3:
+            self.image = self.image3
+        elif num == 4:
+            self.image = self.image4
+        elif num == 5:
+            self.image = self.image5
+        else:
+            self.image = self.image6
+        # variables to animate the sprite
+        self.rect = self.image.get_rect()
+        # set coordinates for sprite
+        self.rect.left = x
+        self.rect.bottom = HEIGHT - 12
+        self.speed = 3
+
+    def update(self):
+        '''
+        update the plant sprite
+        move the plant towards player
+        and delete if out of screen
+        '''
+        # check if plant if out of screen
+        if self.rect.right < -1:
+            self.kill()
+        # move sprite
+        self.rect.x -= self.speed
 
 
 class Birds(pg.sprite.Sprite):
