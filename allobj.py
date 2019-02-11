@@ -1,11 +1,14 @@
 """
 Define most classes and functions
 """
+# import modules
 import pygame as pg
 from os import path
+# init pygame display
 pg.display.set_mode()
+# directory path for all images
 img_dir = path.join(path.dirname(__file__), 'assests_img')
-
+# screen settings
 WIDTH = 675
 HEIGHT = 225
 
@@ -18,6 +21,11 @@ BLUE = (0, 0, 250)
 
 
 class Player(pg.sprite.Sprite):
+    '''
+    the main player sprite (dino)
+    no argument to create instance
+    '''
+
     def __init__(self):
         pg.sprite.Sprite.__init__(self)
         # size in pixels
@@ -33,19 +41,25 @@ class Player(pg.sprite.Sprite):
         self.image = self.player_jump
         self.rect = self.image.get_rect()
         self.rect.center = (40, HEIGHT - 38)
+        # variables for movement of sprite
         self.acc = 9.5  # 8 for small jump(adding later)
         self.y_vel = 0
         self.gravity = 0.5
         self.last_update = 0
         self.duck = False
+        # variables to animate the sprite
         self.current_frame = 0
         self.now = 0
-    # make player jump
 
     def jump(self):
+        # function to make the player 'jump'
         self.y_vel -= self.acc
 
     def update(self):
+        '''
+        update movement, animation
+        and controls of the player sprite
+        '''
         # for changing frame
         prev_x = self.rect.centerx
         prev_y = self.rect.bottom
@@ -66,6 +80,7 @@ class Player(pg.sprite.Sprite):
         else:
             # make player look like running
             self.now = pg.time.get_ticks()
+            # animate the player ducking and running
             if self.duck:
                 if self.now - self.last_update > 100:
                     self.last_update = self.now
@@ -74,6 +89,7 @@ class Player(pg.sprite.Sprite):
                         self.image = pg.transform.scale((self.player_duck1), (55, 26))
                     else:
                         self.image = pg.transform.scale((self.player_duck2), (55, 26))
+            # animate the player running(and not ducking)
             else:
                 if self.now - self.last_update > 100:
                     self.last_update = self.now
@@ -101,12 +117,18 @@ class Player(pg.sprite.Sprite):
             self.rect.bottom = HEIGHT - 16
             self.y_vel = 0
 
-# the plant enemy. contains all sizes
-
 
 class Plant(pg.sprite.Sprite):
-    def __init__(self):
+    '''
+    creates a plant sprite
+    takes 1 argument
+    an integer from 1-6
+    for random generation of plants
+    '''
+
+    def __init__(self, num):
         pg.sprite.Sprite.__init__(self)
+        # load the images of all plants
         self.image1 = pg.image.load(path.join(img_dir, 'small_plant_1.png')).convert()
         self.image2 = pg.image.load(path.join(img_dir, 'small_plant_2.png')).convert()
         self.image3 = pg.image.load(path.join(img_dir, 'small_plant_3.png')).convert()
@@ -114,10 +136,15 @@ class Plant(pg.sprite.Sprite):
         self.image5 = pg.image.load(path.join(img_dir, 'big_plant_2.png')).convert()
         self.image6 = pg.image.load(path.join(img_dir, 'big_plant_3.png')).convert()
 
-# the bird enemy. contains all heights
-
 
 class Birds(pg.sprite.Sprite):
+    '''
+    creates a bird sprite that 'flies'
+    2 arguments to be given
+    the height - 1, 2 or 3
+    and x coordinate to spawn
+    '''
+
     def __init__(self, level, x):
         pg.sprite.Sprite.__init__(self)
         self.image1 = pg.image.load(path.join(img_dir, 'bird_1.png')).convert()
@@ -135,14 +162,18 @@ class Birds(pg.sprite.Sprite):
         # set x coordinate based on input
         self.rect.centerx = self.x
         # decide the y coordinate (level) of the bird
-        if self.level == 0:
+        if self.level == 1:
             self.rect.centery = HEIGHT - 35
-        elif self.level == 1:
+        elif self.level == 2:
             self.rect.centery = HEIGHT - 75
         else:
             self.rect.centery = HEIGHT - 125
 
     def update(self):
+        """
+        update the bird sprite to move,
+        animate(flap) and delete itself, if it goes out of screen
+        """
         # delete bird if out of screen
         if self.rect.right < -1:
             self.kill()
@@ -169,24 +200,35 @@ class Birds(pg.sprite.Sprite):
 platform_img = pg.image.load(path.join(img_dir, 'platform.png')).convert()
 platform_img.set_colorkey(PLATFORM_BLUE)
 
-# the main platform
-
 
 class Platform(pg.sprite.Sprite):
+    '''
+    the platform sprite
+    doesn't contain image but used for collision detection
+    takes 2 arguments
+    x and y coordinates
+    '''
+
     def __init__(self, x, y):
         pg.sprite.Sprite.__init__(self)
+        # variables to create platform to check for collisioins
         self.image = pg.Surface((3000, 3))
         self.image.fill(BLACK)
+        # hide the platform
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.centerx = x
         self.rect.top = y
+        # variables to endlessly loop the img of platform
         self.scrollx = 0
         self.speed = 3
-# fuction to display text on the screen
 
 
 def text(window, text, size, x, y, color='black', ufont='arial'):
+    '''
+    function to display text on the screen
+    takes 7 arguments
+    '''
     # set font to what user wants, else default font
     font_name = pg.font.match_font(ufont)
     # set parameters of the text
