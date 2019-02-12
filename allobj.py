@@ -3,20 +3,12 @@ Define most classes and functions
 """
 # import modules
 import pygame as pg
+import random
+from settings import *
 from os import path
-# init pygame display
+# init pygame display to convert images
 pg.display.set_mode()
-# directory path for all images
-img_dir = path.join(path.dirname(__file__), 'assests_img')
-# screen settings
-WIDTH = 675
-HEIGHT = 225
 
-# colors
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-PLATFORM_BLUE = (64, 202, 201)
-BLUE = (0, 0, 250)
 # the main player (dino) sprite
 
 
@@ -270,3 +262,13 @@ def text(window, text, size, x, y, color='black', ufont='arial'):
     text_rect.centery = y
     # blit(display) the text on the given screen
     window.blit(text_surface, text_rect)
+
+def get_enemy(type):
+    '''
+    returns a number that picks a random enemy
+    takes 1 argument, the type of enemy
+    plant or bird
+    '''
+    if type == 'plant':
+        return random
+    else:

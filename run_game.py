@@ -7,9 +7,6 @@ import random
 import time
 # import other scripts
 from allobj import *
-# fps
-FPS = 60
-
 
 # set up the pygame window
 pg.init()
@@ -18,7 +15,7 @@ screen = pg.display.set_mode([WIDTH, HEIGHT])
 screen.fill(WHITE)
 clock = pg.time.Clock()
 # set caption
-pg.display.set_caption('T-REX Run')
+pg.display.set_caption(TITLE)
 # set icon for game
 game_icon = pg.image.load('game_icon.ico')
 pg.display.set_icon(game_icon)
@@ -34,6 +31,8 @@ all_sprites.add(main_platform)
 # player sprite
 the_player = Player()
 all_sprites.add(the_player)
+# starting obstacles
+
 # start the main game loop
 running = True
 alive = False
