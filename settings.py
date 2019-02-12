@@ -17,8 +17,8 @@ YELLOW = (225, 225, 0)
 TITLE = 'T-REX Run'
 WIDTH = 675
 HEIGHT = 225
-FPS = 40
+FPS = 60
 
 # game speed stuff
-game_speed = 3
-game_speed_change = 1.05
+game_speed = 4.5
+game_speed_change = 0.001

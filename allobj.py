@@ -145,8 +145,8 @@ class Plant(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         # set coordinates for sprite
         self.rect.left = x
-        self.rect.bottom = HEIGHT - 12
-        self.speed = 3
+        self.rect.bottom = HEIGHT - 15
+        self.speed = game_speed
 
     def update(self):
         '''
@@ -154,7 +154,6 @@ class Plant(pg.sprite.Sprite):
         move the plant towards player
         and delete if out of screen
         '''
-        # check if plant if out of screen
         if self.rect.right < -1:
             self.kill()
         # move sprite
@@ -174,7 +173,7 @@ class Birds(pg.sprite.Sprite):
         self.image1 = pg.image.load(path.join(img_dir, 'bird_1.png')).convert()
         self.image2 = pg.image.load(path.join(img_dir, 'bird_2.png')).convert()
         # variables to animate birds
-        self.speed = 3
+        self.speed = game_speed
         self.prev_update = 0
         self.level = level
         self.image = self.image1
@@ -235,6 +234,7 @@ class Platform(pg.sprite.Sprite):
 
     def __init__(self, x, y):
         pg.sprite.Sprite.__init__(self)
+        global game_speed
         # variables to create platform to check for collisioins
         self.image = pg.Surface((3000, 3))
         self.image.fill(BLACK)
@@ -245,23 +245,24 @@ class Platform(pg.sprite.Sprite):
         self.rect.top = y
         # variables to endlessly loop the img of platform
         self.scrollx = 0
-        self.speed = 3
+        self.speed = game_speed
 
 
-def text(window, text, size, x, y, color='black', ufont='arial'):
+def text(window, text, size, x, y, color=BLACK):
     '''
     function to display text on the screen
-    takes 7 arguments
+    takes 6 arguments
     '''
-    # set font to what user wants, else default font
-    font_name = pg.font.match_font(ufont)
     # set parameters of the text
-    text_surface = font_name.render(text, True, color)
+    font_name = pg.font.match_font('arial')
+    font = pg.font.Font(font_name, size)
+    text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect()
     text_rect.centerx = x
     text_rect.centery = y
     # blit(display) the text on the given screen
     window.blit(text_surface, text_rect)
+
 
 def get_enemy(type):
     '''
@@ -270,5 +271,6 @@ def get_enemy(type):
     plant or bird
     '''
     if type == 'plant':
-        return random
+        return random.randrange(1, 7)
     else:
+        return random.randrange(1, 3)
