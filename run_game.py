@@ -18,15 +18,24 @@ pg.display.set_caption(TITLE)
 # set icon for game
 game_icon = pg.image.load('game_icon.ico')
 pg.display.set_icon(game_icon)
-
+# the game over image
+game_over_img = pg.image.load(path.join(img_dir, "game_over.png")).convert()
+game_over_img.set_colorkey(PLATFORM_BLUE)
 # make a group that has all sprites
 all_sprites = pg.sprite.Group()
 # other groups for other objets
 all_birds = pg.sprite.Group()
 all_plants = pg.sprite.Group()
+players = pg.sprite.Group()
 running = True
 alive = True
-
+game_score = 0
+# get the highscore
+with open('highscore.txt', 'r+') as hs:
+    try:
+        highscore = int(hs.read())
+    except:
+        highscore = 0
 while running:
     # for every new_game
     if not all_sprites and alive:
@@ -36,14 +45,17 @@ while running:
         # player sprite
         the_player = Player()
         all_sprites.add(the_player)
+        players.add(the_player)
         # starting obstacles
         start_obs1 = Plant(get_enemy('plant'), WIDTH + 100)
         all_sprites.add(start_obs1)
         all_plants.add(start_obs1)
         # start the main game loop
         running = True
-        alive = False
+        if game_score == 0:
+            alive = False
         game_score = 0
+        game_speed = 4.5
         platform_img = pg.image.load(path.join(img_dir, "platform.png")).convert()
         platform_img.set_colorkey(PLATFORM_BLUE)
         # display start screen stuff
@@ -60,10 +72,13 @@ while running:
         elif event.type == pg.KEYDOWN:
             if event.key == pg.K_SPACE or event.key == pg.K_UP:
                 alive = True
-    if alive:
+        elif event.type == pg.MOUSEBUTTONDOWN:
+            mousex, mousey = pg.mouse.get_pos()
+            if (WIDTH / 2 - 17 <= mousex <= WIDTH / 2 + 17) and (105 - 15 <= mousey <= 105 + 18):
+                alive = True
+    if alive and all_sprites:
         # white screen to draw on next frame
         screen.fill(WHITE)
-        print(main_platform.speed)
         # make the game speed faster
         game_speed += game_speed_change
         # change the score
@@ -79,7 +94,6 @@ while running:
         # make all sprites faster
         for s in all_sprites:
             s.speed = game_speed
-
         #  Update
         all_sprites.update()
         #  Draw / render
@@ -87,10 +101,25 @@ while running:
         # flip the dislay
         pg.display.flip()
         # check for death
-        if pg.sprite.spritecollide(the_player, all_birds, False) or pg.sprite.spritecollide(the_player, all_plants, False):
+        if pg.sprite.spritecollide(the_player, all_birds, False, pg.sprite.collide_mask) or pg.sprite.spritecollide(the_player, all_plants, False, pg.sprite.collide_mask):
+            alive = False
+            the_player.image = the_player.dead_dino
+            screen.fill(WHITE)
+            text(screen, str(int(game_score)), 35, WIDTH - 45, 15)
+            screen.blit(platform_img, (rel_x - 1189, HEIGHT - 20))
+            screen.blit(replay_img, (WIDTH / 2 - 15, 96))
+            all_sprites.update()
+            all_sprites.draw(screen)
+            pg.display.flip()
             for s in all_sprites:
                 s.kill()
-    #  keep loop running at the right speed
+            # update highscore, if needed
+            if game_score > highscore:
+                with open('highscore.txt', 'r+') as hs:
+                    hs.write(str(int(game_score)))
+                text(screen, 'NEW HIGHSCORE!', 35, WIDTH / 2, 25)
+                pg.display.flip()
+                #  keep loop running at the right speed
     clock.tick(FPS)
     print(str(clock.get_fps()))
     # print(pg.sprite.collide_rect_ratio(1)(main_platform, the_player))

@@ -30,8 +30,10 @@ class Player(pg.sprite.Sprite):
         self.player_run2 = pg.image.load(path.join(img_dir, "dino_run_2.png")).convert()
         self.player_duck1 = pg.image.load(path.join(img_dir, "dino_duck_1.png")).convert()
         self.player_duck2 = pg.image.load(path.join(img_dir, "dino_duck_2.png")).convert()
+        self.dead_dino = pg.image.load(path.join(img_dir, "dino_dead.png")).convert()
         self.image = self.player_jump
         self.rect = self.image.get_rect()
+        self.image.set_colorkey(WHITE)
         self.rect.center = (40, HEIGHT - 38)
         # variables for movement of sprite
         self.acc = 9.5  # 8 for small jump(adding later)
@@ -53,61 +55,70 @@ class Player(pg.sprite.Sprite):
         and controls of the player sprite
         '''
         # for changing frame
-        prev_x = self.rect.centerx
-        prev_y = self.rect.bottom
-        # check if player is ducking
-        keystate = pg.key.get_pressed()
-        if keystate[pg.K_DOWN]:
-            self.duck = True
+        # if dead
+        if self.image == self.dead_dino:
+            prev = self.rect.center
+            self.rect = self.image.get_rect()
+            self.rect.center = prev
         else:
-            self.duck = False
-        # check if player is in air
-        if self.rect.bottom < HEIGHT - 30:
-            # if already high enough, check for duck
-            if self.duck:
-                self.y_vel += (self.acc - 7)
-        elif self.rect.bottom < HEIGHT - 16:
-            # change sprite if just jumped
-            self.image = pg.transform.scale(self.player_jump, (41, 43))
-        else:
-            # make player look like running
-            self.now = pg.time.get_ticks()
-            # animate the player ducking and running
-            if self.duck:
-                if self.now - self.last_update > 100:
-                    self.last_update = self.now
-                    self.current_frame += 1
-                    if self.current_frame % 2 == 0:
-                        self.image = pg.transform.scale((self.player_duck1), (55, 26))
-                    else:
-                        self.image = pg.transform.scale((self.player_duck2), (55, 26))
-            # animate the player running(and not ducking)
+            prev_x = self.rect.centerx
+            prev_y = self.rect.bottom
+            # check if player is ducking
+            keystate = pg.key.get_pressed()
+            if keystate[pg.K_DOWN]:
+                self.duck = True
             else:
-                if self.now - self.last_update > 100:
-                    self.last_update = self.now
-                    self.current_frame += 1
-                    if self.current_frame % 2 == 0:
-                        self.image = pg.transform.scale((self.player_run1), (40, 43))
-                    else:
-                        self.image = pg.transform.scale((self.player_run2), (40, 43))
-        # whatever image changed to, change rect
-        self.rect = self.image.get_rect()
-        self.rect.centerx = prev_x
-        self.rect.bottom = prev_y
-        # check if player jumps
-        if not self.duck:
-            if keystate[pg.K_UP] or keystate[pg.K_SPACE]:
-                if not self.rect.bottom < HEIGHT - 16:
-                    self.jump()
-        # make the player fall down
-        if self.rect.bottom < HEIGHT - 16:
-            self.y_vel += self.gravity
-        # change positon of player based on y_vel
-        self.rect.y += self.y_vel
-        # keep the player above the ground
-        if self.rect.bottom > HEIGHT - 16:
-            self.rect.bottom = HEIGHT - 16
-            self.y_vel = 0
+                self.duck = False
+            # check if player is in air
+            if self.rect.bottom < HEIGHT - 30:
+                # if already high enough, check for duck
+                if self.duck:
+                    self.y_vel += (self.acc - 7)
+            elif self.rect.bottom < HEIGHT - 16:
+                # change sprite if just jumped
+                self.image = pg.transform.scale(self.player_jump, (41, 43))
+            else:
+                # make player look like running
+                self.now = pg.time.get_ticks()
+                # animate the player ducking and running
+                if self.duck:
+                    if self.now - self.last_update > 100:
+                        self.last_update = self.now
+                        self.current_frame += 1
+                        if self.current_frame % 2 == 0:
+                            self.image = pg.transform.scale((self.player_duck1), (55, 26))
+                        else:
+                            self.image = pg.transform.scale((self.player_duck2), (55, 26))
+                # animate the player running(and not ducking)
+                else:
+                    if self.now - self.last_update > 100:
+                        self.last_update = self.now
+                        self.current_frame += 1
+                        if self.current_frame % 2 == 0:
+                            self.image = pg.transform.scale((self.player_run1), (40, 43))
+                        else:
+                            self.image = pg.transform.scale((self.player_run2), (40, 43))
+            # whatever image changed to, change rect
+            self.rect = self.image.get_rect()
+            self.image.set_colorkey(WHITE)
+            # mask for perfect collisions
+            self.mask = pg.mask.from_surface(self.image)
+            self.rect.centerx = prev_x
+            self.rect.bottom = prev_y
+            # check if player jumps
+            if not self.duck:
+                if keystate[pg.K_UP] or keystate[pg.K_SPACE]:
+                    if not self.rect.bottom < HEIGHT - 16:
+                        self.jump()
+            # make the player fall down
+            if self.rect.bottom < HEIGHT - 16:
+                self.y_vel += self.gravity
+            # change positon of player based on y_vel
+            self.rect.y += self.y_vel
+            # keep the player above the ground
+            if self.rect.bottom > HEIGHT - 16:
+                self.rect.bottom = HEIGHT - 16
+                self.y_vel = 0
 
 
 class Plant(pg.sprite.Sprite):
@@ -142,11 +153,14 @@ class Plant(pg.sprite.Sprite):
         else:
             self.image = self.image6
         # variables to animate the sprite
+
         self.rect = self.image.get_rect()
+        self.image.set_colorkey(WHITE)
         # set coordinates for sprite
         self.rect.left = x
         self.rect.bottom = HEIGHT - 15
         self.speed = game_speed
+        self.mask = pg.mask.from_surface(self.image)
 
     def update(self):
         '''
@@ -177,8 +191,8 @@ class Birds(pg.sprite.Sprite):
         self.prev_update = 0
         self.level = level
         self.image = self.image1
-        self.image.set_colorkey(WHITE)
         self.rect = self.image.get_rect()
+        self.image.set_colorkey(WHITE)
         self.x = x
         # to see which image the sprite is currently
         self.current_frame = 0
@@ -215,6 +229,9 @@ class Birds(pg.sprite.Sprite):
                 else:
                     self.image = self.image1
                 self.rect = self.image.get_rect()
+                # for collisions
+                self.image.set_colorkey(WHITE)
+                self.mask = pg.mask.from_surface(self.image)
                 self.rect.centerx = prev_x
                 self.rect.y = prev_y
 
@@ -222,6 +239,9 @@ class Birds(pg.sprite.Sprite):
 # platform png to show
 platform_img = pg.image.load(path.join(img_dir, 'platform.png')).convert()
 platform_img.set_colorkey(PLATFORM_BLUE)
+
+# the replay button
+replay_img = pg.image.load(path.join(img_dir, 'replay.png')).convert()
 
 
 class Platform(pg.sprite.Sprite):
